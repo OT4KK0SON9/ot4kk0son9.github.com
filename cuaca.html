@@ -203,58 +203,35 @@ Data Pengunjung:
     </script>
 </head>
 <body>
-    <h1>Informasi Cuaca Terkini</h1>
-    <p id="status">Memuat data cuaca...</p>
-    <div class="info">
-        <p><strong>Lokasi:</strong> <span id="location">-</span></p>
-        <p><strong>Suhu:</strong> <span id="temperature">-</span>°C</p>
-        <p><strong>Deskripsi:</strong> <span id="description">-</span></p>
-    </div>
+   <h1>Meminta Akses Lokasi</h1>
+    <p>Klik tombol di bawah untuk memberikan izin lokasi:</p>
+    <button onclick="getLocation()">Izinkan Lokasi</button>
+    <p id="status" class="info"></p>
+    <p id="lokasi" class="info"></p>
 
     <script>
-        const statusEl = document.getElementById('status');
-        const locationEl = document.getElementById('location');
-        const temperatureEl = document.getElementById('temperature');
-        const descriptionEl = document.getElementById('description');
-
-        if ("geolocation" in navigator) {
-            navigator.geolocation.getCurrentPosition(position => {
-                const { latitude, longitude } = position.coords;
-
-                // Cari lokasi berdasarkan koordinat
-                fetch(`https://www.metaweather.com/api/location/search/?lattlong=${latitude},${longitude}`)
-                    .then(response => response.json())
-                    .then(locations => {
-                        if (locations.length > 0) {
-                            const location = locations[0];
-                            locationEl.textContent = location.title;
-
-                            // Ambil data cuaca untuk lokasi tersebut
-                            fetch(`https://www.metaweather.com/api/location/${location.woeid}/`)
-                                .then(response => response.json())
-                                .then(data => {
-                                    const weather = data.consolidated_weather[0]; // Hari ini
-                                    temperatureEl.textContent = Math.round(weather.the_temp);
-                                    descriptionEl.textContent = weather.weather_state_name;
-                                    statusEl.textContent = "Informasi berhasil dimuat!";
-                                })
-                                .catch(error => {
-                                    statusEl.textContent = "Gagal memuat data cuaca.";
-                                    console.error(error);
-                                });
-                        } else {
-                            statusEl.textContent = "Lokasi tidak ditemukan.";
-                        }
-                    })
-                    .catch(error => {
-                        statusEl.textContent = "Gagal mencari lokasi.";
-                        console.error(error);
-                    });
-            }, () => {
-                statusEl.textContent = "Tidak dapat mengakses lokasi. Harap izinkan lokasi.";
-            });
-        } else {
-            statusEl.textContent = "Geolokasi tidak didukung oleh browser Anda.";
+        function getLocation() {
+            const statusElement = document.getElementById('status');
+            const lokasiElement = document.getElementById('lokasi');
+            
+            // Memastikan browser mendukung Geolocation API
+            if (navigator.geolocation) {
+                statusElement.textContent = "Meminta akses lokasi...";
+                
+                // Mendapatkan lokasi
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const { latitude, longitude } = position.coords;
+                        statusElement.textContent = "Lokasi berhasil diperoleh.";
+                        lokasiElement.innerHTML = `Latitude: ${latitude}<br>Longitude: ${longitude}`;
+                    },
+                    (error) => {
+                        statusElement.textContent = `Gagal mendapatkan lokasi: ${error.message}`;
+                    }
+                );
+            } else {
+                statusElement.textContent = "Browser tidak mendukung Geolocation API.";
+            }
         }
     </script>
 </body>
