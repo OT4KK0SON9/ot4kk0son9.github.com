@@ -7,7 +7,7 @@
   <meta property="og:description" content="DIGO - RED EYE" />
   <meta property="og:image" content="https://private-user-images.githubusercontent.com/160365589/389288550-069ac92f-5a11-469d-9239-fac1b69e6c13.jpg?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MzI0NjU3NTksIm5iZiI6MTczMjQ2NTQ1OSwicGF0aCI6Ii8xNjAzNjU1ODkvMzg5Mjg4NTUwLTA2OWFjOTJmLTVhMTEtNDY5ZC05MjM5LWZhYzFiNjllNmMxMy5qcGc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjQxMTI0JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI0MTEyNFQxNjI0MTlaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT1iODBhYmMwNGVmN2RiZWNhM2IyZjc2OGIyN2NjZjZkYzAyNGMxNWE4ZDU3NjRhMTY3MDgwZTc3ZmY3MzczNDg4JlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.Vgdr8L8g6d1vr1NYVgdu2O0o2nCWrFgw49GqCqEW1BU" />
   <meta property="og:url" content="https://ot4kk0son9.github.io" />
-    <title>Cuaca</title>
+    <title>Haha...</title>
         <style>
         h1 {
             font-family: "Courier New", Courier, monospace;
@@ -203,36 +203,78 @@ Data Pengunjung:
     </script>
 </head>
 <body>
-   <h1>Meminta Akses Lokasi</h1>
-    <p>Klik tombol di bawah untuk memberikan izin lokasi:</p>
-    <button onclick="getLocation()">Izinkan Lokasi</button>
-    <p id="status" class="info"></p>
-    <p id="lokasi" class="info"></p>
+<h1>Meminta Akses Lokasi</h1>
+<p>Klik tombol di bawah untuk memberikan izin lokasi:</p>
+<button onclick="getLocation()">Izinkan Lokasi</button>
+<p id="status" class="info"></p>
+<p id="lokasi" class="info"></p>
+<p id="detail" class="info"></p>
+<div id="map" style="width:100%;height:300px;margin-top:20px;border:1px solid #ccc;"></div>
 
-    <script>
-        function getLocation() {
-            const statusElement = document.getElementById('status');
-            const lokasiElement = document.getElementById('lokasi');
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<script>
+    let map; // Inisialisasi variabel peta
+
+    function getLocation() {
+        const statusElement = document.getElementById('status');
+        const lokasiElement = document.getElementById('lokasi');
+        const detailElement = document.getElementById('detail');
+
+        if (navigator.geolocation) {
+            statusElement.textContent = "Meminta akses lokasi...";
             
-            // Memastikan browser mendukung Geolocation API
-            if (navigator.geolocation) {
-                statusElement.textContent = "Meminta akses lokasi...";
-                
-                // Mendapatkan lokasi
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const { latitude, longitude } = position.coords;
-                        statusElement.textContent = "Lokasi berhasil diperoleh.";
-                        lokasiElement.innerHTML = `Latitude: ${latitude}<br>Longitude: ${longitude}`;
-                    },
-                    (error) => {
-                        statusElement.textContent = `Gagal mendapatkan lokasi: ${error.message}`;
-                    }
-                );
-            } else {
-                statusElement.textContent = "Browser tidak mendukung Geolocation API.";
-            }
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+                    statusElement.textContent = "Lokasi berhasil diperoleh.";
+                    lokasiElement.innerHTML = `Latitude: ${latitude}<br>Longitude: ${longitude}`;
+                    showMap(latitude, longitude);
+                    getDetails(latitude, longitude); // Panggil fungsi untuk mendapatkan detail lokasi
+                },
+                (error) => {
+                    statusElement.textContent = `Gagal mendapatkan lokasi: ${error.message}`;
+                }
+            );
+        } else {
+            statusElement.textContent = "Browser tidak mendukung Geolocation API.";
         }
-    </script>
+    }
+
+    function showMap(latitude, longitude) {
+        if (!map) {
+            map = L.map('map').setView([latitude, longitude], 15); // Buat peta
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+        }
+        
+        // Tambahkan marker
+        L.marker([latitude, longitude]).addTo(map).bindPopup("Lokasi Anda").openPopup();
+    }
+
+    function getDetails(latitude, longitude) {
+        const detailElement = document.getElementById('detail');
+        const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                const address = data.address || {};
+                const detailInfo = `
+                    Negara: ${address.country || 'Tidak diketahui'}<br>
+                    Provinsi: ${address.state || 'Tidak diketahui'}<br>
+                    Kabupaten/Kota: ${address.city || address.town || address.village || 'Tidak diketahui'}<br>
+                    Kecamatan: ${address.suburb || 'Tidak diketahui'}<br>
+                    Kode Pos: ${address.postcode || 'Tidak diketahui'}
+                `;
+                detailElement.innerHTML = detailInfo;
+            })
+            .catch(error => {
+                detailElement.textContent = `Gagal mendapatkan detail lokasi: ${error.message}`;
+            });
+    }
+</script>
 </body>
 </html>
